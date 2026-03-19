@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,7 +12,8 @@ router = APIRouter()
 
 
 @router.get(
-    "/my_selled_transactions", response_model=transaction.SellerTransactionResponse
+    "/my_selled_transactions",
+    response_model=List[transaction.SellerTransactionResponse],
 )
 async def fetch_seller_transaction(
     request: Request,
@@ -23,7 +26,7 @@ async def fetch_seller_transaction(
 
 
 @router.get(
-    "/my_buyed_transactions", response_model=transaction.BuyerTransactionResponse
+    "/my_buyed_transactions", response_model=List[transaction.BuyerTransactionResponse]
 )
 async def fetch_buyed_transaction(
     request: Request,

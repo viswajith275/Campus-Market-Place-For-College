@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional, Sequence
 
-from sqlalchemy import Enum, select
+from sqlalchemy import Enum, exists, select
 from sqlalchemy.dialects.postgresql import array
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
@@ -60,16 +60,13 @@ async def fetch_one_item(item_id: int, user_id: int, db: AsyncSession) -> Item:
         .options(
             joinedload(Item.seller),
             selectinload(Item.images),
-            selectinload(Item.bids),
+            selectinload(Item.bids).joinedload(Bid.bider),
         )
     )
     item = result.scalar_one_or_none()
 
     if item is None:
         raise NotFound("Item not found!")
-
-    if item.status == ItemStatus.Sold and item.seller_id != user_id:
-        raise NotFound("Item already been sold!")
 
     return item
 
@@ -174,7 +171,6 @@ async def update_item(
     user_id: int,
     db: AsyncSession,
 ) -> Item:
-
     patch_data = item_updation_request.model_dump(exclude_unset=True)
 
     if not patch_data:
@@ -193,6 +189,12 @@ async def update_item(
 
     if item is None:
         raise NotFound("Item not Found!")
+
+    result = await db.execute(select(exists().where(Bid.item_id == item_id)))
+    existing_bid = result.scalar()
+
+    if existing_bid and patch_data.get("quantity", None) is not None:
+        raise BadRequest("You cannot update quantity after someone places a bid!")
 
     for key, value in patch_data.items():
         setattr(item, key, value)

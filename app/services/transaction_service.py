@@ -19,7 +19,13 @@ async def fetch_my_selled_transactions(
     result = await db.execute(
         select(Transaction)
         .where(Transaction.seller_id == user_id)
-        .options(joinedload(Transaction.buyer), joinedload(Transaction.item))
+        .options(
+            joinedload(Transaction.buyer),
+            joinedload(Transaction.item).options(
+                joinedload(Item.seller),
+                selectinload(Item.images),
+            ),
+        )
     )
 
     transactions = result.scalars().all()
@@ -36,7 +42,13 @@ async def fetch_my_buyed_transactions(
     result = await db.execute(
         select(Transaction)
         .where(Transaction.buyer_id == user_id)
-        .options(joinedload(Transaction.seller), joinedload(Transaction.item))
+        .options(
+            joinedload(Transaction.seller),
+            joinedload(Transaction.item).options(
+                joinedload(Item.seller),
+                selectinload(Item.images),
+            ),
+        )
     )
 
     transactions = result.scalars().all()
@@ -52,7 +64,11 @@ async def create_transaction(
 ) -> Transaction:
     result = await db.execute(
         select(Item)
-        .where(Item.id == item_id, Item.seller_id == user_id)
+        .where(
+            Item.id == item_id,
+            Item.seller_id == user_id,
+            Item.status == ItemStatus.Active,
+        )
         .options(selectinload(Item.bids))
     )
     item = result.scalar_one_or_none()
@@ -61,7 +77,9 @@ async def create_transaction(
         raise NotFound("Item not Found!")
 
     result = await db.execute(
-        select(Bid).where(Bid.id == bid_id, Bid.item_id == item_id)
+        select(Bid).where(
+            Bid.id == bid_id, Bid.item_id == item_id, Bid.status == BidStatus.Pending
+        )
     )
     bid = result.scalar_one_or_none()
 
@@ -128,9 +146,26 @@ async def create_transaction(
 
         await db.commit()
 
+        result = await db.execute(
+            select(Transaction)
+            .where(Transaction.id == new_transaction.id)
+            .options(
+                joinedload(Transaction.seller),
+                joinedload(Transaction.item).options(
+                    joinedload(Item.seller),
+                    selectinload(Item.images),
+                ),
+            )
+        )
+
+        transaction = result.scalar_one_or_none()
+
+        if transaction is None:
+            raise NotFound("Error!")
+
     except Exception as e:
         await db.rollback()
 
         raise e
 
-    return new_transaction
+    return transaction

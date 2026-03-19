@@ -82,6 +82,16 @@ async def update_rating(
 
         await db.commit()
 
+        result = await db.execute(
+            select(Rating)
+            .where(Rating.id == rating_id)
+            .options(joinedload(Rating.rated_user))
+        )
+        rating = result.scalar_one_or_none()
+
+        if rating is None:
+            raise NotFound("Error!")
+
     except Exception as e:
         await db.rollback()
 
