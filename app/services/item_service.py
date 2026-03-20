@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional, Sequence
 
 from sqlalchemy import Enum, exists, select
-from sqlalchemy.dialects.postgresql import array
+from sqlalchemy.dialects.postgresql import ARRAY, array
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
 
@@ -107,7 +107,7 @@ async def search_item(
     if categories is not None:
         stmt = stmt.where(
             Item.categories.contains(
-                array([c.value for c in categories], type_=Enum(ItemCategories))
+                array([c.value for c in categories], type_=ARRAY(Enum(ItemCategories)))
             )
         )
 
