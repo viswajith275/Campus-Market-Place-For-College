@@ -1,8 +1,8 @@
-"""initial commit
+"""initial migration
 
-Revision ID: 44cead1dae29
+Revision ID: a4b106cf601f
 Revises: 
-Create Date: 2026-03-19 15:32:20.429899
+Create Date: 2026-03-20 17:10:18.941000
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '44cead1dae29'
+revision: str = 'a4b106cf601f'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -45,16 +45,16 @@ def upgrade() -> None:
     sa.Column('min_price', sa.Float(), nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('condition', sa.Enum('New', 'Lightly_Used', 'Heavily_Used', name='itemcondition'), nullable=False),
-    sa.Column('categories', postgresql.ARRAY(sa.Enum('Electronics', 'Stationary', 'Rent', 'Misselaneous', name='itemcategories')), server_default='{}', nullable=False),
+    sa.Column('categories', postgresql.ARRAY(sa.Enum('Electronics', 'Stationary', 'Rent', 'Misseleneous', name='itemcategories')), server_default='{}', nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('status', sa.Enum('Active', 'Sold', name='itemstatus'), nullable=False),
-    sa.Column('search_vector', postgresql.TSVECTOR(), nullable=True),
+    sa.Column('search_vector', postgresql.TSVECTOR(), sa.Computed("to_tsvector('english', coalesce(title, '') || ' ' || coalesce(description, ''))", persisted=True), nullable=True),
     sa.ForeignKeyConstraint(['seller_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('ix_products_categories', 'items', ['categories'], unique=False, postgresql_using='gin')
-    op.create_index('ix_products_categories_nonempty', 'items', ['categories'], unique=False, postgresql_using='gin', postgresql_where=sa.text("categories != '{}'"))
-    op.create_index('ix_products_search_vector', 'items', ['search_vector'], unique=False, postgresql_using='gin')
+    op.create_index('ix_item_categories', 'items', ['categories'], unique=False, postgresql_using='gin')
+    op.create_index('ix_item_categories_nonempty', 'items', ['categories'], unique=False, postgresql_using='gin', postgresql_where=sa.text("categories != '{}'"))
+    op.create_index('ix_item_search_vector', 'items', ['search_vector'], unique=False, postgresql_using='gin')
     op.create_table('notifications',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('type', sa.Enum('Bid_Accepted', 'Bid_Rejected', 'Transaction_Pending', 'Transaction_Completed', 'Rating_Pending', 'Rating_Received', name='notificationtype'), nullable=False),
@@ -146,9 +146,9 @@ def downgrade() -> None:
     op.drop_table('bids')
     op.drop_table('user_tokens')
     op.drop_table('notifications')
-    op.drop_index('ix_products_search_vector', table_name='items', postgresql_using='gin')
-    op.drop_index('ix_products_categories_nonempty', table_name='items', postgresql_using='gin', postgresql_where=sa.text("categories != '{}'"))
-    op.drop_index('ix_products_categories', table_name='items', postgresql_using='gin')
+    op.drop_index('ix_item_search_vector', table_name='items', postgresql_using='gin')
+    op.drop_index('ix_item_categories_nonempty', table_name='items', postgresql_using='gin', postgresql_where=sa.text("categories != '{}'"))
+    op.drop_index('ix_item_categories', table_name='items', postgresql_using='gin')
     op.drop_table('items')
     op.drop_table('users')
     # ### end Alembic commands ###

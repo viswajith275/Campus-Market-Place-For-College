@@ -41,4 +41,4 @@ class ItemCategories(Enum):
     Electronics = "Electronics"
     Stationary = "Stationary"
     Rent = "Rent"
-    Misselaneous = "Misseleneous"
+    Misseleneous = "Misseleneous"

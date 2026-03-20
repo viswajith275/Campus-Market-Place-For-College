@@ -1,9 +1,8 @@
 from datetime import datetime
 from typing import List, Optional
 
-from sqlalchemy import Enum, ForeignKey, Index, text
-from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.dialects.postgresql import TSVECTOR as PG_TSVECTOR
+from sqlalchemy import Computed, Enum, ForeignKey, Index, text
+from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base_class import Base
@@ -31,7 +30,14 @@ class Item(Base):
         Enum(ItemStatus), default=ItemStatus.Active
     )
 
-    search_vector: Mapped[Optional[str]] = mapped_column(PG_TSVECTOR, nullable=True)
+    search_vector: Mapped[str] = mapped_column(
+        TSVECTOR,
+        Computed(
+            "to_tsvector('english', coalesce(title, '') || ' ' || coalesce(description, ''))",
+            persisted=True,
+        ),
+        nullable=True,
+    )
 
     images: Mapped[List["ItemImage"]] = relationship(
         "ItemImage",
@@ -47,10 +53,10 @@ class Item(Base):
     )
 
     __table_args__ = (
-        Index("ix_products_categories", "categories", postgresql_using="gin"),
-        Index("ix_products_search_vector", "search_vector", postgresql_using="gin"),
+        Index("ix_item_categories", "categories", postgresql_using="gin"),
+        Index("ix_item_search_vector", "search_vector", postgresql_using="gin"),
         Index(
-            "ix_products_categories_nonempty",
+            "ix_item_categories_nonempty",
             "categories",
             postgresql_using="gin",
             postgresql_where=text("categories != '{}'"),
