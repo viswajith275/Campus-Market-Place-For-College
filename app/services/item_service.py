@@ -6,9 +6,10 @@ from sqlalchemy.orm import joinedload, selectinload
 
 from app.core.exceptions import BadRequest, NotFound
 from app.models.bid import Bid
-from app.models.enum import ItemCategories, ItemStatus
+from app.models.enum import ItemCategories, ItemStatus, NotificationType
 from app.models.item import Item
 from app.schemas.item import ItemCreate, ItemUpdate
+from app.services.notification_service import notify
 from app.tasks.images import delete_image_task
 
 
@@ -166,6 +167,13 @@ async def create_item(item_request: ItemCreate, user_id: int, db: AsyncSession) 
     if new_item is None:
         raise NotFound("Error!")
 
+    notify(
+        user_id=str(user_id),
+        title="Item created successfully",
+        message=f"{new_item.title} has been created for {new_item.min_price} rupees",
+        type=NotificationType.Item_Created,
+    )
+
     return new_item
 
 
@@ -205,6 +213,13 @@ async def update_item(
 
     await db.commit()
 
+    notify(
+        user_id=str(user_id),
+        title="Item updated successfully",
+        message="Item updated successfully",
+        type=NotificationType.Item_Updated,
+    )
+
     return item
 
 
@@ -232,4 +247,12 @@ async def delete_item(item_id: int, user_id: int, db: AsyncSession) -> Dict:
 
     for path in file_path_to_delete:
         delete_image_task.delay(path)
+
+    notify(
+        user_id=str(user_id),
+        title="Item deleted successfully",
+        message="Item deleted successfully",
+        type=NotificationType.Item_Deleted,
+    )
+
     return {"message": f"Item {item_id} deleted successfully!"}

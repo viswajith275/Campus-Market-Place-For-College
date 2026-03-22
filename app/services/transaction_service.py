@@ -6,11 +6,12 @@ from sqlalchemy.orm import joinedload, selectinload
 
 from app.core.exceptions import BadRequest, NotFound
 from app.models.bid import Bid
-from app.models.enum import BidStatus, ItemStatus
+from app.models.enum import BidStatus, ItemStatus, NotificationType
 from app.models.item import Item
 from app.models.rating import Rating
 from app.models.transaction import Transaction
 from app.models.user import User
+from app.services.notification_service import notify
 
 
 async def fetch_my_selled_transactions(
@@ -95,10 +96,22 @@ async def create_transaction(
 
             for b in item.bids:
                 b.status = BidStatus.Rejected
+                notify(
+                    user_id=b.bider_id,
+                    title="Bid rejected",
+                    message=f"Bid of {b.price} has been rejected for {item.title}",
+                    type=NotificationType.Bid_Rejected,
+                )
 
         item.quantity -= bid.quantity
 
         bid.status = BidStatus.Accepted
+        notify(
+            user_id=str(bid.bider_id),
+            title="Bid Accepted",
+            message=f"Bid of {bid.price} has been accepted for {item.title}",
+            type=NotificationType.Bid_Accepted,
+        )
 
         new_transaction = Transaction(
             item_id=item_id,
@@ -143,6 +156,18 @@ async def create_transaction(
         seller.locked = True
         bider.transaction_count += 1
         bider.locked = True
+        notify(
+            user_id=str(seller.id),
+            title="Rating pending",
+            message=f"Rating for {bider.username} is pending",
+            type=NotificationType.Rating_Pending,
+        )
+        notify(
+            user_id=str(bider.id),
+            title="Rating Pending",
+            message=f"Rating for {seller.username} is pending",
+            type=NotificationType.Rating_Pending,
+        )
 
         await db.commit()
 

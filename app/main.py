@@ -30,7 +30,7 @@ app.add_exception_handler(BadRequest, exception_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # change this
+    allow_origins=["http://127.0.0.1:8000"],  # change this
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -6,9 +6,10 @@ from sqlalchemy.orm import selectinload
 
 from app.core.exceptions import BadRequest, Conflict, NotFound
 from app.models.bid import Bid
-from app.models.enum import BidStatus
+from app.models.enum import BidStatus, NotificationType
 from app.models.item import Item
 from app.schemas.bid import BidCreate, BidUpdate
+from app.services.notification_service import notify
 
 
 async def create_bid(
@@ -50,6 +51,13 @@ async def create_bid(
     await db.commit()
     await db.refresh(new_bid)
 
+    notify(
+        user_id=str(user_id),
+        title="Bid created successfully",
+        message=f"Bid of {new_bid.price} has been successfully created for {item.title}",
+        type=NotificationType.Bid_Created,
+    )
+
     return new_bid
 
 
@@ -84,6 +92,12 @@ async def update_bid(
         setattr(bid, key, value)
 
     await db.commit()
+    notify(
+        user_id=str(user_id),
+        title="Bid updated successfully",
+        message="Bid Successfully updated!",
+        type=NotificationType.Bid_Updated,
+    )
 
     return bid
 
@@ -104,5 +118,12 @@ async def delete_bid(bid_id: int, user_id: int, db: AsyncSession) -> Dict:
 
     await db.delete(bid)
     await db.commit()
+
+    notify(
+        user_id=str(user_id),
+        title="Bid deleted successfully",
+        message="Bid Successfully deleted!",
+        type=NotificationType.Bid_Deleted,
+    )
 
     return {"message": "Bid deleted successfully!"}

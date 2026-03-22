@@ -15,5 +15,9 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int
     refresh_token_expire_days: int
 
+    @property
+    def sync_database_url(self) -> str:
+        return self.database_url.replace("postgresql+asyncpg://", "postgresql://")
+
 
 settings = Settings()

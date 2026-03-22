@@ -6,10 +6,11 @@ from sqlalchemy.orm import joinedload
 
 from app.core.config import settings
 from app.core.exceptions import BadRequest, NotFound
-from app.models.enum import RatingStatus, TransactionStatus
+from app.models.enum import NotificationType, RatingStatus, TransactionStatus
 from app.models.rating import Rating
 from app.models.transaction import Transaction
 from app.models.user import User
+from app.services.notification_service import notify
 
 
 async def fetch_my_ratings(user_id: int, db: AsyncSession) -> Sequence[Rating]:
@@ -96,5 +97,12 @@ async def update_rating(
         await db.rollback()
 
         raise e
+
+    notify(
+        user_id=str(rated.id),
+        title="Rating updated",
+        message=f"Your rating has been updated to {rated.rating}",
+        type=NotificationType.Rating_Received,
+    )
 
     return rating

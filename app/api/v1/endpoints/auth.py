@@ -65,7 +65,7 @@ async def login_user(
         value=f"Bearer {access_token}",
         httponly=True,
         secure=False,
-        samesite="lax",
+        samesite="lax",  # change later
     )
 
     response.set_cookie(
@@ -73,7 +73,7 @@ async def login_user(
         value=refresh_token,
         httponly=True,
         secure=False,
-        samesite="lax",
+        samesite="lax",  # change later
     )
 
     return user
