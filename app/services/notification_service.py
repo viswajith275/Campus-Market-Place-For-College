@@ -45,11 +45,8 @@ async def notification_generator(user_id: int):
 async def fetch_notifications(
     user_id: int,
     db: AsyncSession,
-    unread_only: bool = False,
 ) -> Sequence[Notification]:
     q = select(Notification).where(Notification.user_id == user_id)
-    if unread_only:
-        q = q.where(Notification.is_read == False)
     result = await db.execute(q.order_by(Notification.created_at.desc()).limit(50))
     return result.scalars().all()
 
@@ -72,7 +69,7 @@ def notify(
     payload: dict | None = None,
 ) -> None:
     send_notification.delay(
-        user_id=user_id,
+        user_id=str(user_id),
         title=title,
         message=message,
         type=type,

@@ -20,12 +20,12 @@ def send_notification(
     payload: Dict | None = None,
 ):
     try:
-        _run(user_id, title, message, type, payload or {})
+        run(user_id, title, message, type, payload or {})
     except Exception as exc:
         raise self.retry(exc=exc)
 
 
-def _run(user_id, title, message, type, payload):
+def run(user_id, title, message, type, payload):
     with SyncSessionLocal() as session:
         notif = Notification(
             user_id=user_id,
@@ -38,7 +38,7 @@ def _run(user_id, title, message, type, payload):
         session.commit()
         session.refresh(notif)
 
-    _push_to_redis(
+    push_to_redis(
         str(user_id),
         {
             "id": str(notif.id),
@@ -50,7 +50,7 @@ def _run(user_id, title, message, type, payload):
     )
 
 
-def _push_to_redis(user_id: str, data: dict):
+def push_to_redis(user_id: str, data: dict):
     r = redis.from_url(settings.redis_url)
     r.publish(f"sse:{user_id}", json.dumps(data))
     r.close()
