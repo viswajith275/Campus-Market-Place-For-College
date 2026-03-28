@@ -32,7 +32,7 @@ async def get_token_from_cookie(request: Request) -> str:
     token = request.cookies.get("access_token")
 
     if not token:
-        raise UnAuthorized("Not Authenticated")
+        raise UnAuthorized("Not authenticated")
 
     if token.startswith("Bearer "):
         token = token.split(" ")[1]
@@ -54,7 +54,7 @@ async def get_current_user(
 
         if user_id is None or payload.get("type") != "access":
             raise UnAuthorized(
-                "Token Invalid or expired",
+                "Token invalid or expired",
             )
 
         result = await db.execute(select(User).where(User.id == user_id))
@@ -62,7 +62,7 @@ async def get_current_user(
         return result.scalars().first()
 
     except Exception as e:
-        raise UnAuthorized(f"Invalid Token: {e}")
+        raise e
 
 
 # checking the user is not banned or revoked by the admin
@@ -133,7 +133,7 @@ async def validate_refresh_token(refresh_token: str, db: AsyncSession) -> int:
 
         return user_id
     except Exception as e:
-        raise UnAuthorized(f"Invalid Token: {e}")
+        raise UnAuthorized(str(e))
 
 
 async def delete_refresh_token(refresh_token: str | None, db: AsyncSession) -> None:

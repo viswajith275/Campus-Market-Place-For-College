@@ -50,6 +50,7 @@ class NotificationType(str, Enum):
 class ItemCategory(str, Enum):
     Electronics = "Electronics"
     Stationary = "Stationary"
+    Accessories = "Accessories"
     Rent = "Rent"
     Misseleneous = "Misseleneous"
 
@@ -59,3 +60,5 @@ class ReportCategory(str, Enum):
     Explicit_or_Adult_Content = "Explicit_or_Adult_Content"
     Restricted_or_Prohibited_Items = "Restricted_or_Prohibited_Items"
     Inappropriate_Content = "Inappropriate_Content"
+    Taking_Too_Much_Time = "Taking_Too_Much_Time"
+    Other = "Other"

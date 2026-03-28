@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from app.core.celery import celery_app
+from app.core.celery import worker_celery_app
 
 
-@celery_app.task
+@worker_celery_app.task
 def delete_image_task(image_path: str):
 
     if not image_path:
