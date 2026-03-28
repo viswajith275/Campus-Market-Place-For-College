@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/my_selled_transactions",
+    "/my-selled-transactions",
     response_model=List[transaction.SellerTransactionResponse],
 )
 async def fetch_seller_transaction(
@@ -26,7 +26,7 @@ async def fetch_seller_transaction(
 
 
 @router.get(
-    "/my_buyed_transactions", response_model=List[transaction.BuyerTransactionResponse]
+    "/my-buyed-transactions", response_model=List[transaction.BuyerTransactionResponse]
 )
 async def fetch_buyed_transaction(
     request: Request,

@@ -4,7 +4,6 @@ from enum import Enum
 class ItemStatus(str, Enum):
     Active = "Active"
     Sold = "Sold"
-    Removed = "Removed"
 
 
 class UserRole(str, Enum):
@@ -45,6 +44,7 @@ class NotificationType(str, Enum):
     Bid_Deleted = "Bid_Deleted"
     Rating_Pending = "Rating_Pending"
     Rating_Received = "Rating_Received"
+    Reported_Successfully = "Reported_Successfully"
 
 
 class ItemCategory(str, Enum):

@@ -36,7 +36,7 @@ async def fetch_search_items(
     )
 
 
-@router.get("/selled_items", response_model=List[item.ItemResponse])
+@router.get("/selled-items", response_model=List[item.ItemResponse])
 async def fetch_my_items(
     request: Request,
     skip: int = Query(default=0, ge=0, description="No of items to skip"),
@@ -49,7 +49,7 @@ async def fetch_my_items(
     )
 
 
-@router.get("/bided_items", response_model=List[item.ItemResponse])
+@router.get("/bided-items", response_model=List[item.ItemResponse])
 async def fetch_my_bided_items(
     request: Request,
     skip: int = Query(default=0, ge=0, description="No of items to skip"),

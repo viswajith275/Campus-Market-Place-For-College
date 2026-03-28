@@ -4,9 +4,11 @@ from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import BadRequest, NotFound
+from app.models.enum import NotificationType
 from app.models.item import Item
 from app.models.report import Report
 from app.schemas.report import ReportCreate
+from app.services.notification_service import notify
 
 
 async def report_item(
@@ -40,5 +42,12 @@ async def report_item(
 
     db.add(new_report)
     await db.commit()
+
+    notify(
+        user_id=str(user_id),
+        title="Reported successfully",
+        message=f"Item {item.title} has been reported successfully for {report_request.category.value}",
+        type=NotificationType.Reported_Successfully,
+    )
 
     return {"message": "Reported successfully!"}

@@ -6,7 +6,8 @@ from pydantic.config import ConfigDict
 from app.models.enum import ItemCategory, ItemCondition, ItemStatus
 from app.schemas.bid import BidResponse
 from app.schemas.item_image import ItemImageResponse
-from app.schemas.user import PublicUsersResponse
+from app.schemas.report import ReportResponse
+from app.schemas.user import ProtectedUserResponse, PublicUsersResponse
 
 
 class ItemResponse(BaseModel):
@@ -26,6 +27,18 @@ class ItemResponse(BaseModel):
 
 class UniqueItemResponse(ItemResponse):
     bids: List[BidResponse]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AdminItemResponse(ItemResponse):
+    seller: ProtectedUserResponse
+
+
+class AdminUniqueItemResponse(AdminItemResponse):
+    reports: List[ReportResponse]
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ItemCreate(BaseModel):

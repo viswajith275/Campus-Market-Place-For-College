@@ -8,9 +8,7 @@ from app.core.exceptions import BadRequest, NotFound
 from app.models.bid import Bid
 from app.models.enum import ItemCategory, ItemStatus, NotificationType
 from app.models.item import Item
-from app.models.report import Report
 from app.schemas.item import ItemCreate, ItemUpdate
-from app.schemas.report import ReportCreate
 from app.services.notification_service import notify
 from app.tasks.images import delete_image_task
 
@@ -218,7 +216,7 @@ async def update_item(
     notify(
         user_id=str(user_id),
         title="Item updated successfully",
-        message="Item updated successfully",
+        message=f"Item {item.title} updated successfully",
         type=NotificationType.Item_Updated,
     )
 
@@ -236,6 +234,7 @@ async def delete_item(item_id: int, user_id: int, db: AsyncSession) -> Dict:
     if item is None:
         raise NotFound("Item not found!")
 
+    item_title = item.title
     file_path_to_delete = [image.image_path for image in item.images]
 
     await db.delete(item)
@@ -253,7 +252,7 @@ async def delete_item(item_id: int, user_id: int, db: AsyncSession) -> Dict:
     notify(
         user_id=str(user_id),
         title="Item deleted successfully",
-        message="Item deleted successfully",
+        message=f"Item {item_title} deleted successfully",
         type=NotificationType.Item_Deleted,
     )
 
