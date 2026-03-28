@@ -4,6 +4,7 @@ from app.models.item import Item
 from app.models.item_image import ItemImage
 from app.models.notification import Notification
 from app.models.rating import Rating
+from app.models.report import Report
 from app.models.token import UserToken
 from app.models.transaction import Transaction
 from app.models.user import User

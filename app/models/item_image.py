@@ -1,7 +1,8 @@
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, event
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base_class import Base
+from app.tasks.images import delete_image_task
 
 
 class ItemImage(Base):
@@ -15,3 +16,10 @@ class ItemImage(Base):
     # relationship with
 
     item: Mapped["Item"] = relationship("Item", back_populates="images")
+
+
+@event.listens_for(ItemImage, "after_delete")
+def delete_image_after_cascade(mapper, connection, image):
+
+    if image.image_path:
+        delete_image_task.delay(image.image_path)

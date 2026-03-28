@@ -1,12 +1,12 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 from sqlalchemy import Computed, Enum, ForeignKey, Index, text
 from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base_class import Base
-from app.models.enum import ItemCategories, ItemCondition, ItemStatus
+from app.models.enum import ItemCategory, ItemCondition, ItemStatus
 
 
 class Item(Base):
@@ -21,8 +21,8 @@ class Item(Base):
     min_price: Mapped[float] = mapped_column()
     quantity: Mapped[int] = mapped_column()
     condition: Mapped[ItemCondition] = mapped_column()
-    categories: Mapped[List[ItemCategories]] = mapped_column(
-        ARRAY(Enum(ItemCategories)), server_default="{}"
+    categories: Mapped[List[ItemCategory]] = mapped_column(
+        ARRAY(Enum(ItemCategory)), server_default="{}"
     )
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow())
 
@@ -40,16 +40,20 @@ class Item(Base):
     )
 
     images: Mapped[List["ItemImage"]] = relationship(
-        "ItemImage",
-        back_populates="item",
-        passive_deletes=True,
+        "ItemImage", back_populates="item", cascade="all, delete-orphan"
     )
+
     seller: Mapped["User"] = relationship("User", back_populates="listed_items")
+
     bids: Mapped[List["Bid"]] = relationship(
         "Bid", back_populates="item", cascade="all, delete-orphan"
     )
+
     transaction: Mapped["Transaction"] = relationship(
         back_populates="item", cascade="all, delete-orphan"
+    )
+    reports: Mapped[List["Report"]] = relationship(
+        "Report", back_populates="item", cascade="all, delete-orphan"
     )
 
     __table_args__ = (

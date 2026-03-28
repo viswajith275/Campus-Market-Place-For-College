@@ -4,6 +4,12 @@ from enum import Enum
 class ItemStatus(str, Enum):
     Active = "Active"
     Sold = "Sold"
+    Removed = "Removed"
+
+
+class UserRole(str, Enum):
+    User = "User"
+    Admin = "Admin"
 
 
 class ItemCondition(str, Enum):
@@ -41,8 +47,15 @@ class NotificationType(str, Enum):
     Rating_Received = "Rating_Received"
 
 
-class ItemCategories(Enum):
+class ItemCategory(str, Enum):
     Electronics = "Electronics"
     Stationary = "Stationary"
     Rent = "Rent"
     Misseleneous = "Misseleneous"
+
+
+class ReportCategory(str, Enum):
+    Illegal_Items = "Illegal_Items"
+    Explicit_or_Adult_Content = "Explicit_or_Adult_Content"
+    Restricted_or_Prohibited_Items = "Restricted_or_Prohibited_Items"
+    Inappropriate_Content = "Inappropriate_Content"

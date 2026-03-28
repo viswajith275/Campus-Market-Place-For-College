@@ -2,6 +2,8 @@ import re
 
 from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
 
+from app.models.enum import UserRole
+
 
 # Base user model
 class PrivateUsersResponse(BaseModel):
@@ -10,6 +12,7 @@ class PrivateUsersResponse(BaseModel):
     phone_no: str
     rating: float
     locked: bool
+    role: UserRole
     disabled: bool
 
     model_config = ConfigDict(from_attributes=True)

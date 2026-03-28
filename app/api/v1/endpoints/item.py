@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import deps
-from app.models.enum import ItemCategories
+from app.models.enum import ItemCategory
 from app.models.user import User
 from app.schemas import item
 from app.services import item_service
@@ -26,7 +26,7 @@ async def fetch_feed(
 async def fetch_search_items(
     request: Request,
     search: Optional[str] = Query(None, min_length=3),
-    categories: Optional[List[ItemCategories]] = Query(None),
+    categories: Optional[List[ItemCategory]] = Query(None),
     skip: int = Query(default=0, ge=0, description="No of items to skip"),
     limit: int = Query(default=10, ge=1, le=50, description="No of items needed"),
     db: AsyncSession = Depends(deps.get_db),
@@ -69,9 +69,7 @@ async def fetch_one_item(
     current_user: User = Depends(deps.get_current_active_user),
     db: AsyncSession = Depends(deps.get_db),
 ):
-    return await item_service.fetch_one_item(
-        item_id=item_id, user_id=current_user.id, db=db
-    )
+    return await item_service.fetch_one_item(item_id=item_id, db=db)
 
 
 @router.post("/create", response_model=item.ItemResponse)

@@ -1,9 +1,11 @@
 from datetime import datetime
 from typing import List
 
+from sqlalchemy import Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base_class import Base
+from app.models.enum import UserRole
 
 
 class User(Base):
@@ -12,6 +14,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(unique=True)
     email: Mapped[str] = mapped_column(unique=True)
+    role: Mapped[UserRole] = mapped_column(Enum(UserRole), default=UserRole.User)
     phone_no: Mapped[str] = mapped_column()
     hashed_password: Mapped[str] = mapped_column()
     disabled: Mapped[bool] = mapped_column(default=False)
@@ -34,3 +37,4 @@ class User(Base):
     notifications: Mapped[List["Notification"]] = relationship(
         "Notification", back_populates="user", cascade="all, delete-orphan"
     )
+    reports: Mapped[List["Report"]] = relationship("Report", back_populates="reporter")

@@ -6,9 +6,11 @@ from sqlalchemy.orm import joinedload, selectinload
 
 from app.core.exceptions import BadRequest, NotFound
 from app.models.bid import Bid
-from app.models.enum import ItemCategories, ItemStatus, NotificationType
+from app.models.enum import ItemCategory, ItemStatus, NotificationType
 from app.models.item import Item
+from app.models.report import Report
 from app.schemas.item import ItemCreate, ItemUpdate
+from app.schemas.report import ReportCreate
 from app.services.notification_service import notify
 from app.tasks.images import delete_image_task
 
@@ -53,7 +55,7 @@ async def fetch_my_selled_items(
     return items
 
 
-async def fetch_one_item(item_id: int, user_id: int, db: AsyncSession) -> Item:
+async def fetch_one_item(item_id: int, db: AsyncSession) -> Item:
     result = await db.execute(
         select(Item)
         .where(Item.id == item_id)
@@ -97,7 +99,7 @@ async def fetch_my_bided_items(
 
 async def search_item(
     search_query: Optional[str],
-    categories: Optional[List[ItemCategories]],
+    categories: Optional[List[ItemCategory]],
     skip: int,
     limit: int,
     db: AsyncSession,
@@ -109,7 +111,7 @@ async def search_item(
             Item.categories.contains(
                 cast(
                     [c.value for c in categories],
-                    ARRAY(Enum(ItemCategories, name="itemcategories")),
+                    ARRAY(Enum(ItemCategory, name="itemcategories")),
                 )
             )
         )

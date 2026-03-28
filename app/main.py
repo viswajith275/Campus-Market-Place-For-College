@@ -11,6 +11,7 @@ from app.core.exceptions import (
     Conflict,
     DetailedHTTPException,
     NotFound,
+    UnAuthorized,
     exception_handler,
 )
 
@@ -24,13 +25,14 @@ app.mount(path="/app/static", app=StaticFiles(directory="app/static"), name="sta
 
 
 app.add_exception_handler(DetailedHTTPException, exception_handler)
+app.add_exception_handler(UnAuthorized, exception_handler)
 app.add_exception_handler(NotFound, exception_handler)
 app.add_exception_handler(Conflict, exception_handler)
 app.add_exception_handler(BadRequest, exception_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5173"],  # change thisuvi
+    allow_origins=["http://127.0.0.1:5173"],  # change this uri
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

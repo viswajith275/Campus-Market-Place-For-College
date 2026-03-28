@@ -17,6 +17,11 @@ class NotFound(DetailedHTTPException):
     code = "NOT_FOUND"
 
 
+class UnAuthorized(DetailedHTTPException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    code = "UnAuthorized"
+
+
 class BadRequest(DetailedHTTPException):
     status_code = status.HTTP_400_BAD_REQUEST
     code = "BAD_REQUEST"
@@ -28,7 +33,8 @@ class Conflict(DetailedHTTPException):
 
 
 async def exception_handler(
-    request: Request, exc: DetailedHTTPException | NotFound | BadRequest | Conflict
+    request: Request,
+    exc: DetailedHTTPException | NotFound | BadRequest | Conflict | UnAuthorized,
 ):
     return JSONResponse(
         status_code=exc.status_code,

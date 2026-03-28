@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel, field_validator
 from pydantic.config import ConfigDict
 
-from app.models.enum import ItemCategories, ItemCondition, ItemStatus
+from app.models.enum import ItemCategory, ItemCondition, ItemStatus
 from app.schemas.bid import BidResponse
 from app.schemas.item_image import ItemImageResponse
 from app.schemas.user import PublicUsersResponse
@@ -17,7 +17,7 @@ class ItemResponse(BaseModel):
     min_price: float
     quantity: int
     status: ItemStatus
-    categories: List[ItemCategories]
+    categories: List[ItemCategory]
     condition: ItemCondition
     images: List[ItemImageResponse] = []
 
@@ -34,7 +34,7 @@ class ItemCreate(BaseModel):
     min_price: float
     quantity: int
     condition: ItemCondition
-    categories: List[ItemCategories]
+    categories: List[ItemCategory]
 
     @field_validator("title")
     @classmethod
@@ -73,8 +73,8 @@ class ItemCreate(BaseModel):
     @field_validator("categories")
     @classmethod
     def category_validator(
-        cls, c: List[ItemCategories] | None
-    ) -> List[ItemCategories] | None:
+        cls, c: List[ItemCategory] | None
+    ) -> List[ItemCategory] | None:
         if c is not None and len(set(c)) != len(c):
             ValueError("Same category was assigned twice!")
         return c
@@ -86,4 +86,4 @@ class ItemUpdate(ItemCreate):
     min_price: Optional[float] = None
     quantity: Optional[int] = None
     condition: Optional[ItemCondition] = None
-    categories: Optional[List[ItemCategories]] = None
+    categories: Optional[List[ItemCategory]] = None

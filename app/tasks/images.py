@@ -10,7 +10,7 @@ def delete_image_task(image_path: str):
         return
 
     try:
-        path = Path("app") / Path(image_path)
+        path = Path(image_path)
         if path.exists() or path.is_file():
             path.unlink()
             return f"Successfully deleted: {path}"
