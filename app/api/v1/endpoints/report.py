@@ -9,7 +9,7 @@ from app.services import report_service
 router = APIRouter()
 
 
-@router.get("/{item_id}")
+@router.post("/{item_id}")
 async def report_item(
     request: Request,
     report_request: report.ReportCreate,

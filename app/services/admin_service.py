@@ -9,6 +9,7 @@ from app.models.enum import ItemStatus, NotificationType
 from app.models.item import Item
 from app.models.report import Report
 from app.services.notification_service import notify
+from app.tasks.images import delete_image_task
 
 
 async def fetch_feed(skip: int, limit: int, db: AsyncSession) -> Sequence[Item]:

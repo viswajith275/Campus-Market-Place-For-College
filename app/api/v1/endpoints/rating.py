@@ -11,7 +11,7 @@ from app.services import rating_service
 router = APIRouter()
 
 
-@router.get("/my_ratings", response_model=List[rating.RatingResponse])
+@router.get("/my-ratings", response_model=List[rating.RatingResponse])
 async def fetch_my_ratings(
     request: Request,
     current_user: User = Depends(deps.get_current_active_user),
