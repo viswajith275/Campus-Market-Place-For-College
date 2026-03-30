@@ -17,6 +17,7 @@ class ItemResponse(BaseModel):
     description: str
     min_price: float
     quantity: int
+    bid_count: int
     status: ItemStatus
     categories: List[ItemCategory]
     condition: ItemCondition

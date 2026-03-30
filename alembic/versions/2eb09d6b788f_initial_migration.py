@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: ca3bee0583eb
+Revision ID: 2eb09d6b788f
 Revises: 
-Create Date: 2026-03-28 14:35:46.693300
+Create Date: 2026-03-30 21:29:29.505441
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'ca3bee0583eb'
+revision: str = '2eb09d6b788f'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -46,9 +46,9 @@ def upgrade() -> None:
     sa.Column('min_price', sa.Float(), nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('condition', sa.Enum('New', 'Lightly_Used', 'Heavily_Used', name='itemcondition'), nullable=False),
-    sa.Column('categories', postgresql.ARRAY(sa.Enum('Electronics', 'Stationary', 'Rent', 'Misseleneous', name='itemcategory')), server_default='{}', nullable=False),
+    sa.Column('categories', postgresql.ARRAY(sa.Enum('Electronics', 'Stationary', 'Accessories', 'Rent', 'Misseleneous', name='itemcategory')), server_default='{}', nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('status', sa.Enum('Active', 'Sold', 'Removed', name='itemstatus'), nullable=False),
+    sa.Column('status', sa.Enum('Active', 'Sold', name='itemstatus'), nullable=False),
     sa.Column('search_vector', postgresql.TSVECTOR(), sa.Computed("to_tsvector('english', coalesce(title, '') || ' ' || coalesce(description, ''))", persisted=True), nullable=True),
     sa.ForeignKeyConstraint(['seller_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -58,7 +58,7 @@ def upgrade() -> None:
     op.create_index('ix_item_search_vector', 'items', ['search_vector'], unique=False, postgresql_using='gin')
     op.create_table('notifications',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('type', sa.Enum('Item_Created', 'Item_Updated', 'Item_Deleted', 'Bid_Created', 'Bid_Updated', 'Bid_Accepted', 'Bid_Rejected', 'Bid_Deleted', 'Rating_Pending', 'Rating_Received', name='notificationtype'), nullable=False),
+    sa.Column('type', sa.Enum('Item_Created', 'Item_Updated', 'Item_Deleted', 'Bid_Created', 'Bid_Updated', 'Bid_Accepted', 'Bid_Rejected', 'Bid_Deleted', 'Rating_Pending', 'Rating_Received', 'Reported_Successfully', name='notificationtype'), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
     sa.Column('message', sa.String(), nullable=False),
     sa.Column('is_read', sa.Boolean(), nullable=False),
@@ -98,7 +98,7 @@ def upgrade() -> None:
     )
     op.create_table('reports',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('category', sa.Enum('Illegal_Items', 'Explicit_or_Adult_Content', 'Restricted_or_Prohibited_Items', 'Inappropriate_Content', name='reportcategory'), nullable=False),
+    sa.Column('category', sa.Enum('Illegal_Items', 'Explicit_or_Adult_Content', 'Restricted_or_Prohibited_Items', 'Inappropriate_Content', 'Taking_Too_Much_Time', 'Other', name='reportcategory'), nullable=False),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('reporter_id', sa.Integer(), nullable=False),
