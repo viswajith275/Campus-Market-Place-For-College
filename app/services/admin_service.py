@@ -60,7 +60,7 @@ async def delete_item(item_id: int, db: AsyncSession) -> Dict:
     result = await db.execute(
         select(Item)
         .where(Item.id == item_id, Item.status == ItemStatus.Active)
-        .options(selectinload(Item.images))
+        .options(selectinload(Item.images), selectinload(Item.bids))
     )
     item = result.scalar_one_or_none()
 
@@ -70,6 +70,7 @@ async def delete_item(item_id: int, db: AsyncSession) -> Dict:
     item_title = item.title
     item_seller_id = item.seller_id
     file_path_to_delete = [image.image_path for image in item.images]
+    bider_ids = [bid.bider_id for bid in item.bids]
 
     await db.delete(item)
 
@@ -89,5 +90,13 @@ async def delete_item(item_id: int, db: AsyncSession) -> Dict:
         message=f"Item {item_title} deleted by admin due to uncompromisable practises!",
         type=NotificationType.Item_Deleted,
     )
+
+    for id in bider_ids:
+        notify(
+            user_id=str(id),
+            title=f"Bided item {item_title} removed",
+            message=f"Item {item_title} removed by admin!",
+            type=NotificationType.Bid_Deleted,
+        )
 
     return {"message": f"Item {item_id} deleted successfully!"}
