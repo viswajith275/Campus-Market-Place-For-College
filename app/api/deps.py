@@ -61,6 +61,11 @@ async def get_current_user(
 
         return result.scalars().first()
 
+    except jwt.ExpiredSignatureError:
+        raise UnAuthorized(
+            "Token invalid or expired",
+        )
+
     except Exception as e:
         raise e
 

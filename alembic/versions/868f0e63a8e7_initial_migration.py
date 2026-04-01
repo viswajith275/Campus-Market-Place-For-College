@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 2eb09d6b788f
+Revision ID: 868f0e63a8e7
 Revises: 
-Create Date: 2026-03-30 21:29:29.505441
+Create Date: 2026-04-01 21:00:34.724517
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '2eb09d6b788f'
+revision: str = '868f0e63a8e7'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -46,7 +46,7 @@ def upgrade() -> None:
     sa.Column('min_price', sa.Float(), nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('condition', sa.Enum('New', 'Lightly_Used', 'Heavily_Used', name='itemcondition'), nullable=False),
-    sa.Column('categories', postgresql.ARRAY(sa.Enum('Electronics', 'Stationary', 'Accessories', 'Rent', 'Misseleneous', name='itemcategory')), server_default='{}', nullable=False),
+    sa.Column('categories', postgresql.ARRAY(sa.Enum('Electronics', 'Stationary', 'Accessories', 'Rent', 'Miscellaneous', name='itemcategory')), server_default='{}', nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('status', sa.Enum('Active', 'Sold', name='itemstatus'), nullable=False),
     sa.Column('search_vector', postgresql.TSVECTOR(), sa.Computed("to_tsvector('english', coalesce(title, '') || ' ' || coalesce(description, ''))", persisted=True), nullable=True),

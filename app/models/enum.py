@@ -52,7 +52,7 @@ class ItemCategory(str, Enum):
     Stationary = "Stationary"
     Accessories = "Accessories"
     Rent = "Rent"
-    Misseleneous = "Misseleneous"
+    Miscellaneous = "Miscellaneous"
 
 
 class ReportCategory(str, Enum):
