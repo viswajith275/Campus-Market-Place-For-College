@@ -36,6 +36,19 @@ async def fetch_search_items(
     )
 
 
+@router.get("/bided-items", response_model=List[item.BidHistoryResponse])
+async def fetch_my_bided_items(
+    request: Request,
+    skip: int = Query(default=0, ge=0, description="No of bids to skip"),
+    limit: int = Query(default=10, ge=1, le=50, description="No of bids needed"),
+    current_user: User = Depends(deps.get_current_active_user),
+    db: AsyncSession = Depends(deps.get_db),
+):
+    return await item_service.fetch_my_bided_items(
+        skip=skip, limit=limit, user_id=current_user.id, db=db
+    )
+
+
 @router.get("/selled-items", response_model=List[item.ItemResponse])
 async def fetch_my_items(
     request: Request,
@@ -46,19 +59,6 @@ async def fetch_my_items(
 ):
     return await item_service.fetch_my_selled_items(
         db=db, user_id=current_user.id, skip=skip, limit=limit
-    )
-
-
-@router.get("/bided-items", response_model=List[item.ItemResponse])
-async def fetch_my_bided_items(
-    request: Request,
-    skip: int = Query(default=0, ge=0, description="No of items to skip"),
-    limit: int = Query(default=10, ge=1, le=50, description="No of items needed"),
-    current_user: User = Depends(deps.get_current_active_user),
-    db: AsyncSession = Depends(deps.get_db),
-):
-    return await item_service.fetch_my_bided_items(
-        skip=skip, limit=limit, user_id=current_user.id, db=db
     )
 
 

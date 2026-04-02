@@ -12,6 +12,7 @@ class BidResponse(BaseModel):
     quantity: int
     bider: PublicUsersResponse
     status: BidStatus
+    model_config = ConfigDict(from_attributes=True)
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -73,26 +73,25 @@ async def fetch_one_item(item_id: int, db: AsyncSession) -> Item:
 
 async def fetch_my_bided_items(
     skip: int, limit: int, user_id: int, db: AsyncSession
-) -> Sequence[Item]:
+) -> Sequence[Bid]:
     result = await db.execute(
-        select(Item)
-        .join(Bid)
+        select(Bid)
         .where(Bid.bider_id == user_id)
         .options(
-            joinedload(Item.seller),
-            selectinload(Item.images),
-            selectinload(Item.bids),
+            joinedload(Bid.item).options(
+                joinedload(Item.seller), selectinload(Item.images)
+            ),
         )
-        .order_by(Item.created_at.desc())
+        .order_by(Bid.created_at.desc())
         .offset(skip)
         .limit(limit)
     )
-    items = result.scalars().all()
+    bids = result.scalars().all()
 
-    if not items:
-        raise NotFound("No items found!")
+    if not bids:
+        raise NotFound("No Bids found!")
 
-    return items
+    return bids
 
 
 async def search_item(

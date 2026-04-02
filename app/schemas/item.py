@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel, field_validator
 from pydantic.config import ConfigDict
 
-from app.models.enum import ItemCategory, ItemCondition, ItemStatus
+from app.models.enum import BidStatus, ItemCategory, ItemCondition, ItemStatus
 from app.schemas.bid import BidResponse
 from app.schemas.item_image import ItemImageResponse
 from app.schemas.report import ReportResponse
@@ -22,6 +22,47 @@ class ItemResponse(BaseModel):
     categories: List[ItemCategory]
     condition: ItemCondition
     images: List[ItemImageResponse] = []
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class BidItemResponse(BaseModel):
+    id: int
+    title: str
+    seller: PublicUsersResponse
+    min_price: float
+    categories: List[ItemCategory]
+    condition: ItemCondition
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class BidHistoryResponse(BaseModel):
+    id: int
+    price: float
+    quantity: int
+    bider: PublicUsersResponse
+    status: BidStatus
+    item: BidItemResponse
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class BuyerTransactionItemResponse(BaseModel):
+    id: int
+    title: str
+    seller: ProtectedUserResponse
+    categories: List[ItemCategory]
+    condition: ItemCondition
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class SellerTransactionItemResponse(BaseModel):
+    id: int
+    title: str
+    categories: List[ItemCategory]
+    condition: ItemCondition
 
     model_config = ConfigDict(from_attributes=True)
 
