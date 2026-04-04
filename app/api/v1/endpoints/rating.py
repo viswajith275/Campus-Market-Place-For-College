@@ -20,7 +20,7 @@ async def fetch_my_ratings(
     return await rating_service.fetch_my_ratings(user_id=current_user.id, db=db)
 
 
-@router.get("/{rating_id}/{score}", response_model=rating.RatingResponse)
+@router.get("/{rating_id}/{score}")
 async def update_rating(
     request: Request,
     rating_id: int,

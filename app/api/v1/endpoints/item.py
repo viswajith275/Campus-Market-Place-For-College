@@ -84,7 +84,7 @@ async def create_item(
     )
 
 
-@router.patch("/{item_id}", response_model=item.ItemResponse)
+@router.patch("/{item_id}")
 async def update_item(
     request: Request,
     item_id: int,

@@ -3,13 +3,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import deps
 from app.models.user import User
-from app.schemas.item_image import ItemImageResponse
 from app.services import item_image_service
 
 router = APIRouter()
 
 
-@router.post("/{item_id}", response_model=ItemImageResponse)
+@router.post("/{item_id}")
 async def create_image(
     request: Request,
     item_id: int,

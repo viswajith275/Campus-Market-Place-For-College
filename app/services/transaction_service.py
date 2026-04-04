@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Dict, Sequence
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -60,7 +60,7 @@ async def fetch_my_buyed_transactions(
 
 async def create_transaction(
     item_id: int, bid_id: int, user_id: int, db: AsyncSession
-) -> Transaction:
+) -> Dict:
     result = await db.execute(
         select(Item)
         .where(
@@ -154,22 +154,10 @@ async def create_transaction(
         seller.locked = True
         bider.transaction_count += 1
         bider.locked = True
-        notify(
-            user_id=str(seller.id),
-            title="Rating pending",
-            message=f"Rating for {bider.username} is pending",
-            type=NotificationType.Rating_Pending,
-        )
-        notify(
-            user_id=str(bider.id),
-            title="Rating Pending",
-            message=f"Rating for {seller.username} is pending",
-            type=NotificationType.Rating_Pending,
-        )
 
         await db.commit()
 
-        result = await db.execute(
+        """result = await db.execute(
             select(Transaction)
             .where(Transaction.id == new_transaction.id)
             .options(
@@ -184,11 +172,24 @@ async def create_transaction(
         transaction = result.scalar_one_or_none()
 
         if transaction is None:
-            raise NotFound("Error!")
+            raise NotFound("Error!")"""
 
     except Exception as e:
         await db.rollback()
 
         raise e
 
-    return transaction
+    notify(
+        user_id=str(seller.id),
+        title="Rating pending",
+        message=f"Rating for {bider.username} is pending",
+        type=NotificationType.Rating_Pending,
+    )
+    notify(
+        user_id=str(bider.id),
+        title="Rating Pending",
+        message=f"Rating for {seller.username} is pending",
+        type=NotificationType.Rating_Pending,
+    )
+
+    return {"message": "Transaction created successfully!"}

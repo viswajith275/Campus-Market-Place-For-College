@@ -181,7 +181,7 @@ async def update_item(
     item_id: int,
     user_id: int,
     db: AsyncSession,
-) -> Item:
+) -> Dict:
     patch_data = item_updation_request.model_dump(exclude_unset=True)
 
     if not patch_data:
@@ -219,7 +219,7 @@ async def update_item(
         type=NotificationType.Item_Updated,
     )
 
-    return item
+    return {"message": "Item updated successfully!"}
 
 
 async def delete_item(item_id: int, user_id: int, db: AsyncSession) -> Dict:

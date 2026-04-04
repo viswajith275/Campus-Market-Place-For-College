@@ -14,7 +14,7 @@ from app.services.notification_service import notify
 
 async def create_bid(
     item_id: int, user_id: int, bid_request: BidCreate, db: AsyncSession
-) -> Bid:
+) -> Dict:
     result = await db.execute(select(Item).where(Item.id == item_id))
     item = result.scalar_one_or_none()
 
@@ -58,12 +58,12 @@ async def create_bid(
         type=NotificationType.Bid_Created,
     )
 
-    return new_bid
+    return {"message": "Bid created successfully!"}
 
 
 async def update_bid(
     bid_id: int, user_id: int, bid_patch: BidUpdate, db: AsyncSession
-) -> Bid:
+) -> Dict:
     result = await db.execute(
         select(Bid)
         .where(
@@ -99,7 +99,7 @@ async def update_bid(
         type=NotificationType.Bid_Updated,
     )
 
-    return bid
+    return {"message": "Bid updated successfully!"}
 
 
 async def delete_bid(bid_id: int, user_id: int, db: AsyncSession) -> Dict:

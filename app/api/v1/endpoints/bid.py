@@ -9,7 +9,7 @@ from app.services import bid_service
 router = APIRouter()
 
 
-@router.post("/{item_id}", response_model=bid.BidResponse)
+@router.post("/{item_id}")
 async def create_bid(
     request: Request,
     item_id: int,
@@ -22,7 +22,7 @@ async def create_bid(
     )
 
 
-@router.patch("/{bid_id}", response_model=bid.BidResponse)
+@router.patch("/{bid_id}")
 async def update_bid(
     request: Request,
     bid_id: int,

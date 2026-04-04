@@ -21,7 +21,7 @@ allowed_types = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp
 
 async def save_image(
     item_id: int, user_id: int, image: UploadFile, db: AsyncSession
-) -> ItemImage:
+) -> Dict:
     result = await db.execute(
         select(Item)
         .where(Item.id == item_id, Item.seller_id == user_id)
@@ -85,7 +85,7 @@ async def save_image(
 
         raise e
 
-    return new_image
+    return {"message": "Image created successfully!"}
 
 
 async def delete_image(image_id: int, user_id: int, db: AsyncSession) -> Dict:

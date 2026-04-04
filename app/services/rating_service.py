@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Dict, Sequence
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -29,7 +29,7 @@ async def fetch_my_ratings(user_id: int, db: AsyncSession) -> Sequence[Rating]:
 
 async def update_rating(
     rating_id: int, user_id: int, score: float, db: AsyncSession
-) -> Rating:
+) -> Dict:
 
     result = await db.execute(
         select(Rating).where(
@@ -83,7 +83,7 @@ async def update_rating(
 
         await db.commit()
 
-        result = await db.execute(
+        """result = await db.execute(
             select(Rating)
             .where(Rating.id == rating_id)
             .options(joinedload(Rating.rated_user))
@@ -91,7 +91,7 @@ async def update_rating(
         rating = result.scalar_one_or_none()
 
         if rating is None:
-            raise NotFound("Error!")
+            raise NotFound("Error!")"""
 
     except Exception as e:
         await db.rollback()
@@ -105,4 +105,4 @@ async def update_rating(
         type=NotificationType.Rating_Received,
     )
 
-    return rating
+    return {"message": "Rating updated successfully!"}

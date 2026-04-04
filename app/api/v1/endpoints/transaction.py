@@ -38,9 +38,7 @@ async def fetch_buyed_transaction(
     )
 
 
-@router.post(
-    "/{item_id}/{bid_id}", response_model=transaction.SellerTransactionResponse
-)
+@router.post("/{item_id}/{bid_id}")
 async def create_transaction(
     request: Request,
     item_id: int,

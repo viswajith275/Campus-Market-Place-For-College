@@ -40,7 +40,10 @@ class Item(Base):
     )
 
     images: Mapped[List["ItemImage"]] = relationship(
-        "ItemImage", back_populates="item", cascade="all, delete-orphan"
+        "ItemImage",
+        back_populates="item",
+        cascade="all, delete-orphan",
+        order_by="ItemImage.created_at.desc()",
     )
 
     seller: Mapped["User"] = relationship("User", back_populates="listed_items")
