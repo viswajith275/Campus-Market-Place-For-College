@@ -137,7 +137,7 @@ async def search_item(
     return items
 
 
-async def create_item(item_request: ItemCreate, user_id: int, db: AsyncSession) -> Item:
+async def create_item(item_request: ItemCreate, user_id: int, db: AsyncSession) -> Dict:
 
     new_item = Item(
         seller_id=user_id,
@@ -151,8 +151,9 @@ async def create_item(item_request: ItemCreate, user_id: int, db: AsyncSession) 
 
     db.add(new_item)
     await db.commit()
+    await db.refresh(new_item)
 
-    result = await db.execute(
+    """result = await db.execute(
         select(Item)
         .where(Item.id == new_item.id)
         .options(
@@ -164,7 +165,7 @@ async def create_item(item_request: ItemCreate, user_id: int, db: AsyncSession) 
     new_item = result.scalar_one_or_none()
 
     if new_item is None:
-        raise NotFound("Error!")
+        raise NotFound("Error!")"""
 
     notify(
         user_id=str(user_id),
@@ -173,7 +174,10 @@ async def create_item(item_request: ItemCreate, user_id: int, db: AsyncSession) 
         type=NotificationType.Item_Created,
     )
 
-    return new_item
+    return {
+        "message": "Item created successfully!",
+        "id": new_item.id,
+    }
 
 
 async def update_item(

@@ -72,7 +72,7 @@ async def fetch_one_item(
     return await item_service.fetch_one_item(item_id=item_id, db=db)
 
 
-@router.post("/create", response_model=item.ItemResponse)
+@router.post("/create")
 async def create_item(
     request: Request,
     item_request: item.ItemCreate,
