@@ -1,20 +1,15 @@
-import os
-import uuid
 from typing import Dict
 
-import aiofiles
-import aiofiles.os
-import magic
 from fastapi import UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.core.config import settings
 from app.core.exceptions import BadRequest, NotFound
 from app.models.item import Item
 from app.models.item_image import ItemImage
-from app.tasks.images import delete_image_task
+from app.tasks.images import delete_image_task, process_image_task
+from app.utils.image import save_and_validate_raw_image
 
 allowed_types = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
 
@@ -36,56 +31,19 @@ async def save_image(
     if len(item.images) > 3:
         raise BadRequest("You have reached the limit for images!")
 
-    if image.content_type not in allowed_types:
-        raise BadRequest(
-            f"Unsupported media type. Allowed: {allowed_types.keys}",
-        )
+    raw_path = await save_and_validate_raw_image(image)
+    # Add raw processing function
+    # Remove EXIF data and add resizing quality control etc...
 
-    first_chunk = await image.read(2048)  # Read first 2KB to check headers
-    actual_mime_type = magic.from_buffer(first_chunk, mime=True)
-
-    if actual_mime_type not in allowed_types:
-        raise BadRequest(
-            f"Unsupported media type. Allowed: {allowed_types}",
-        )
-
-    await image.seek(0)
-
-    extension_map = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
-    file_extension = extension_map.get(actual_mime_type, ".bin")
-    unique_filename = f"{uuid.uuid4()}{file_extension}"
-    file_path = os.path.join(f"app/{settings.upload_directory}", unique_filename)
-
-    saved_bytes = 0
-    try:
-        async with aiofiles.open(file_path, "wb") as out_file:
-            while content := await image.read(1024 * 1024):  # 1MB chunks
-                saved_bytes += len(content)
-                if saved_bytes > settings.max_image_size:
-                    await aiofiles.os.remove(file_path)
-                    raise BadRequest(
-                        f"File exceeds maximum allowed size of {settings.max_image_size / 1024 / 1024}MB."
-                    )
-                await out_file.write(content)
-    except Exception as e:
-        raise e
-
-    new_image = ItemImage(item_id=item_id, image_path=file_path)
+    new_image = ItemImage(item_id=item_id)
     db.add(new_image)
 
-    try:
-        await db.commit()
-        await db.refresh(new_image)
+    await db.commit()
+    await db.refresh(new_image)
 
-    except Exception as e:
-        await db.rollback()
+    process_image_task.delay(str(raw_path.absolute()), new_image.id)
 
-        if await aiofiles.os.path.exists(file_path):
-            await aiofiles.os.remove(file_path)
-
-        raise e
-
-    return {"message": "Image created successfully!"}
+    return {"message": "Image added successfully!"}
 
 
 async def delete_image(image_id: int, user_id: int, db: AsyncSession) -> Dict:
@@ -102,6 +60,9 @@ async def delete_image(image_id: int, user_id: int, db: AsyncSession) -> Dict:
         raise NotFound("Image not found!")
 
     file_path = image.image_path
+
+    if file_path is None:
+        raise BadRequest("Wait till the processing of image!")
 
     await db.delete(image)
 

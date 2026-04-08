@@ -62,3 +62,8 @@ class ReportCategory(str, Enum):
     Inappropriate_Content = "Inappropriate_Content"
     Taking_Too_Much_Time = "Taking_Too_Much_Time"
     Other = "Other"
+
+
+class ImageStatus(str, Enum):
+    Pending = "Pending"
+    Completed = "Completed"

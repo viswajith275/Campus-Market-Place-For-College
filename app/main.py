@@ -1,11 +1,10 @@
-import os
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.api.v1.router import router
-from app.core.config import settings
 from app.core.exceptions import (
     BadRequest,
     Conflict,
@@ -17,11 +16,8 @@ from app.core.exceptions import (
 
 app = FastAPI()
 
-abs_path = os.path.dirname(os.path.abspath(__file__))
-new_path = os.path.join(abs_path, settings.upload_directory)
-os.makedirs(new_path, exist_ok=True)
 
-app.mount(path="/app/static", app=StaticFiles(directory="app/static"), name="static")
+app.mount(path="/static", app=StaticFiles(directory="static"), name="static")
 
 
 app.add_exception_handler(DetailedHTTPException, exception_handler)

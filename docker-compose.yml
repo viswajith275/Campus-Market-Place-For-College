@@ -76,7 +76,7 @@ services:
       migrate:
         condition: service_completed_successfully
     volumes:
-      - static:/app/app/static
+      - static:/app/static
     networks:
       - ecommerce_network
 
@@ -102,6 +102,8 @@ services:
       migrate:
         condition: service_completed_successfully
     command: celery -A app.core.celery worker --loglevel=info
+    volumes:
+      - static:/app/static
     networks:
       - ecommerce_network
 
