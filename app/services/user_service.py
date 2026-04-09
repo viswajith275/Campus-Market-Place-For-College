@@ -1,3 +1,5 @@
+from typing import Dict
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -19,7 +21,7 @@ async def get_by_username(db: AsyncSession, username: str) -> User | None:
     return result.scalar_one_or_none()
 
 
-async def create_user(db: AsyncSession, user_in: UserCreate) -> User:
+async def create_user(db: AsyncSession, user_in: UserCreate) -> Dict[str, str]:
 
     if await get_by_email(db, user_in.email):
         raise Conflict(message=f"user with email {user_in.email} already exists!")
@@ -40,7 +42,7 @@ async def create_user(db: AsyncSession, user_in: UserCreate) -> User:
     await db.commit()
     await db.refresh(user_obj)
 
-    return user_obj
+    return {"message": "User created successfully!"}
 
 
 async def authenticate_user(

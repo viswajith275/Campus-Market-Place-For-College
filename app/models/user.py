@@ -1,11 +1,11 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy import Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base_class import Base
-from app.models.enum import UserRole
+from app.models.enum import ImageStatus, UserRole
 
 
 class User(Base):
@@ -18,6 +18,10 @@ class User(Base):
     phone_no: Mapped[str] = mapped_column()
     hashed_password: Mapped[str] = mapped_column()
     disabled: Mapped[bool] = mapped_column(default=False)
+    image_status: Mapped[ImageStatus] = mapped_column(
+        Enum(ImageStatus), default=ImageStatus.Completed
+    )
+    image_path: Mapped[Optional[str]] = mapped_column()
     transaction_count: Mapped[int] = mapped_column(default=0)
     total_rating: Mapped[float] = mapped_column(default=0)
     rating: Mapped[float] = mapped_column(default=2.5)

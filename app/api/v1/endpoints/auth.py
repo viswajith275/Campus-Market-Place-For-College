@@ -14,12 +14,7 @@ from app.services import user_service
 router = APIRouter()
 
 
-@router.get("/me", response_model=PrivateUsersResponse)
-def read_user_me(current_user: User = Depends(deps.get_current_active_user)):
-    return current_user
-
-
-@router.post("/register", response_model=PrivateUsersResponse)
+@router.post("/register")
 async def create_user(
     request: Request, user_in: UserCreate, db: AsyncSession = Depends(deps.get_db)
 ):

@@ -7,6 +7,7 @@ from app.api.v1.endpoints import (
     item,
     item_image,
     notification,
+    profile,
     rating,
     report,
     transaction,
@@ -25,3 +26,4 @@ router.include_router(
 )
 router.include_router(report.router, tags=["Report"], prefix="/reports")
 router.include_router(admin.router, tags=["Admin"], prefix="/admin")
+router.include_router(profile.router, tags=["Profile"], prefix="/profile")

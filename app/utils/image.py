@@ -48,7 +48,7 @@ async def save_and_validate_raw_image(image) -> Path:
     return raw_path
 
 
-def process_raw_image(raw_path: Path) -> Path:
+def process_raw_image(raw_path: Path, max_dim: int) -> Path:
 
     with open(raw_path, "rb") as i:
         data = i.read()
@@ -60,7 +60,7 @@ def process_raw_image(raw_path: Path) -> Path:
 
     img = strip_exif_metadata(img)
 
-    img = resize(img, 1200)
+    img = resize(img, max_dim)
 
     img = prepare_for_webp_format(img)
 
@@ -95,10 +95,12 @@ def resize(img: Image.Image, max_dim: int) -> Image.Image:
 
 
 def prepare_for_webp_format(img: Image.Image) -> Image.Image:
+
     if img.mode == "RGBA":
         background = Image.new("RGB", img.size, (255, 255, 255))
         background.paste(img, mask=img.split()[3])  # 3 is the alpha channel A in RGBA
         return background
+
     return img.convert("RGB") if img.mode != "RGB" else img
 
 

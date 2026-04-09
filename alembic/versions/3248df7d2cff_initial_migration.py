@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 67a8f7e013a6
+Revision ID: 3248df7d2cff
 Revises: 
-Create Date: 2026-04-08 09:04:50.777950
+Create Date: 2026-04-09 19:01:21.462885
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '67a8f7e013a6'
+revision: str = '3248df7d2cff'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -29,6 +29,8 @@ def upgrade() -> None:
     sa.Column('phone_no', sa.String(), nullable=False),
     sa.Column('hashed_password', sa.String(), nullable=False),
     sa.Column('disabled', sa.Boolean(), nullable=False),
+    sa.Column('image_status', sa.Enum('Pending', 'Completed', name='imagestatus'), nullable=False),
+    sa.Column('image_path', sa.String(), nullable=True),
     sa.Column('transaction_count', sa.Integer(), nullable=False),
     sa.Column('total_rating', sa.Float(), nullable=False),
     sa.Column('rating', sa.Float(), nullable=False),

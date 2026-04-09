@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
 
@@ -11,6 +12,7 @@ class PrivateUsersResponse(BaseModel):
     email: str
     phone_no: str
     rating: float
+    image_path: Optional[str] = None
     locked: bool
     role: UserRole
     disabled: bool
@@ -21,6 +23,7 @@ class PrivateUsersResponse(BaseModel):
 class PublicUsersResponse(BaseModel):
     username: str
     rating: float
+    image_path: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

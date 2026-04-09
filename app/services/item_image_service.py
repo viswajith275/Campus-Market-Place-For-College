@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 from app.core.exceptions import BadRequest, NotFound
 from app.models.item import Item
 from app.models.item_image import ItemImage
-from app.tasks.images import delete_image_task, process_image_task
+from app.tasks.images import delete_image_task, process_item_image_task
 from app.utils.image import save_and_validate_raw_image
 
 allowed_types = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
@@ -41,7 +41,7 @@ async def save_image(
     await db.commit()
     await db.refresh(new_image)
 
-    process_image_task.delay(str(raw_path.absolute()), new_image.id)
+    process_item_image_task.delay(str(raw_path.absolute()), new_image.id)
 
     return {"message": "Image added successfully!"}
 
