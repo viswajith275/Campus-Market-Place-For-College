@@ -2,12 +2,13 @@ from typing import Dict, List, Optional, Sequence
 
 from sqlalchemy import ARRAY, Enum, cast, exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy.orm import joinedload, selectinload, with_loader_criteria
 
 from app.core.exceptions import BadRequest, NotFound
 from app.models.bid import Bid
-from app.models.enum import ItemCategory, ItemStatus, NotificationType
+from app.models.enum import ImageStatus, ItemCategory, ItemStatus, NotificationType
 from app.models.item import Item
+from app.models.item_image import ItemImage
 from app.schemas.item import ItemCreate, ItemUpdate
 from app.services.notification_service import notify
 from app.tasks.images import delete_image_task
@@ -17,12 +18,15 @@ async def fetch_feed(skip: int, limit: int, db: AsyncSession) -> Sequence[Item]:
     result = await db.execute(
         select(Item)
         .where(Item.status == ItemStatus.Active)
-        .options(joinedload(Item.seller), selectinload(Item.images))
+        .options(
+            joinedload(Item.seller),
+            selectinload(Item.images),
+            with_loader_criteria(ItemImage, ItemImage.status == ImageStatus.Completed),
+        )
         .order_by(Item.created_at.desc())
         .offset(skip)
         .limit(limit)
     )
-
     items = result.scalars().all()
 
     if not items:
@@ -40,6 +44,7 @@ async def fetch_my_selled_items(
         .options(
             joinedload(Item.seller),
             selectinload(Item.images),
+            with_loader_criteria(ItemImage, ItemImage.status == ImageStatus.Completed),
         )
         .order_by(Item.created_at.desc())
         .offset(skip)
@@ -60,6 +65,7 @@ async def fetch_one_item(item_id: int, db: AsyncSession) -> Item:
         .options(
             joinedload(Item.seller),
             selectinload(Item.images),
+            with_loader_criteria(ItemImage, ItemImage.status == ImageStatus.Completed),
             selectinload(Item.bids).joinedload(Bid.bider),
         )
     )
@@ -79,8 +85,10 @@ async def fetch_my_bided_items(
         .where(Bid.bider_id == user_id)
         .options(
             joinedload(Bid.item).options(
-                joinedload(Item.seller), selectinload(Item.images)
+                joinedload(Item.seller),
+                selectinload(Item.images),
             ),
+            with_loader_criteria(ItemImage, ItemImage.status == ImageStatus.Completed),
         )
         .order_by(Bid.created_at.desc())
         .offset(skip)
@@ -124,6 +132,7 @@ async def search_item(
         stmt.options(
             joinedload(Item.seller),
             selectinload(Item.images),
+            with_loader_criteria(ItemImage, ItemImage.status == ImageStatus.Completed),
         )
         .order_by(Item.created_at.desc())
         .offset(skip)
