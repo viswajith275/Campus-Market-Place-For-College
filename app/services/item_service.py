@@ -220,6 +220,9 @@ async def update_item(
     if existing_bid and patch_data.get("quantity", None) is not None:
         raise BadRequest("You cannot update quantity after someone places a bid!")
 
+    if existing_bid and patch_data.get("min_price", None) is not None:
+        raise BadRequest("You cannot update price after someone places a bid!")
+
     for key, value in patch_data.items():
         setattr(item, key, value)
 

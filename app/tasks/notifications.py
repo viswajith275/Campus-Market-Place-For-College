@@ -26,7 +26,7 @@ def send_notification(
 
 
 def run(user_id, title, message, type, payload):
-    with SyncSessionLocal() as session:
+    with SyncSessionLocal() as db:
         notif = Notification(
             user_id=user_id,
             title=title,
@@ -34,9 +34,9 @@ def run(user_id, title, message, type, payload):
             type=type,
             payload=payload,
         )
-        session.add(notif)
-        session.commit()
-        session.refresh(notif)
+        db.add(notif)
+        db.commit()
+        db.refresh(notif)
 
     push_to_redis(
         str(user_id),
