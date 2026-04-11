@@ -37,6 +37,6 @@ async def exception_handler(
     exc: DetailedHTTPException | NotFound | BadRequest | Conflict | UnAuthorized,
 ):
     return JSONResponse(
-        status_code=exc.status_code,
+        status_code=status.HTTP_200_OK,
         content={"error_code": exc.code, "message": exc.message},
     )
