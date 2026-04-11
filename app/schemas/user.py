@@ -1,7 +1,8 @@
 import re
-from typing import Optional
+from typing import Annotated, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
+from pydantic_extra_types import phone_numbers
 
 from app.models.enum import UserRole
 
@@ -15,7 +16,6 @@ class PrivateUsersResponse(BaseModel):
     image_path: Optional[str] = None
     locked: bool
     role: UserRole
-    disabled: bool
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -39,7 +39,12 @@ class ProtectedUserResponse(PublicUsersResponse):
 class UserCreate(BaseModel):
     username: str
     email: EmailStr
-    phone_no: str
+    phone_no: Annotated[
+        Union[str, phone_numbers.PhoneNumber],
+        phone_numbers.PhoneNumberValidator(
+            default_region="IN", supported_regions=["IN"], number_format="E164"
+        ),
+    ]
     password: str
 
     @field_validator("username")
@@ -61,19 +66,6 @@ class UserCreate(BaseModel):
         if not e.endswith("@gectcr.ac.in"):
             raise ValueError("This is not a student email of GECT")
         return e
-
-    @field_validator("phone_no")
-    @classmethod
-    def phone_no_validation(cls, p: str) -> str:
-        try:
-            p = str(int(p))
-
-            if len(p) != 10:
-                raise ValueError("This is not a valid phone number!")
-
-            return p
-        except Exception as e:
-            raise ValueError(f"This is not a valid phone number! {e}")
 
     @field_validator("password")
     @classmethod
