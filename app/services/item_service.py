@@ -202,7 +202,11 @@ async def update_item(
 
     result = await db.execute(
         select(Item)
-        .where(Item.id == item_id, Item.seller_id == user_id)
+        .where(
+            Item.id == item_id,
+            Item.seller_id == user_id,
+            Item.status == ItemStatus.Active,
+        )
         .options(
             joinedload(Item.seller),
             selectinload(Item.images),
@@ -241,7 +245,11 @@ async def update_item(
 async def delete_item(item_id: int, user_id: int, db: AsyncSession) -> Dict:
     result = await db.execute(
         select(Item)
-        .where(Item.id == item_id, Item.seller_id == user_id)
+        .where(
+            Item.id == item_id,
+            Item.seller_id == user_id,
+            Item.status == ItemStatus.Active,
+        )
         .options(selectinload(Item.images))
     )
     item = result.scalar_one_or_none()
