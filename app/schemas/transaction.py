@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from pydantic.config import ConfigDict
 
 from app.models.enum import TransactionStatus
-from app.schemas.item import BuyerTransactionItemResponse, SellerTransactionItemResponse
+from app.schemas.item import TransactionItemResponse
 from app.schemas.user import ProtectedUserResponse
 
 
@@ -11,15 +11,16 @@ class SellerTransactionResponse(BaseModel):
     price: float
     status: TransactionStatus
     quantity: int
-    item: SellerTransactionItemResponse
+    item: TransactionItemResponse
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class BuyerTransactionResponse(BaseModel):
+    seller: ProtectedUserResponse
     price: float
     status: TransactionStatus
     quantity: int
-    item: BuyerTransactionItemResponse
+    item: TransactionItemResponse
 
     model_config = ConfigDict(from_attributes=True)

@@ -43,8 +43,8 @@ async def fetch_my_buyed_transactions(
         select(Transaction)
         .where(Transaction.buyer_id == user_id)
         .options(
+            joinedload(Transaction.seller),
             joinedload(Transaction.item).options(
-                joinedload(Item.seller),
                 selectinload(Item.images),
             ),
         )

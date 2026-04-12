@@ -48,21 +48,12 @@ class BidHistoryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class BuyerTransactionItemResponse(BaseModel):
-    id: int
-    title: str
-    seller: ProtectedUserResponse
-    categories: List[ItemCategory]
-    condition: ItemCondition
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class SellerTransactionItemResponse(BaseModel):
+class TransactionItemResponse(BaseModel):
     id: int
     title: str
     categories: List[ItemCategory]
     condition: ItemCondition
+    images: List[ItemImageResponse] = []
 
     model_config = ConfigDict(from_attributes=True)
 
