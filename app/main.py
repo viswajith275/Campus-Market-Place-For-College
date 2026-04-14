@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.api.v1.router import router
+from app.core.celery import worker_celery_app
 from app.core.exceptions import (
     BadRequest,
     Conflict,
@@ -26,7 +27,7 @@ app.add_exception_handler(BadRequest, exception_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://0.0.0.0:5173"],  # change this uri
+    allow_origins=["http://0.0.0.0:5173", "null"],  # change this uri
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

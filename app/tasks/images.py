@@ -1,11 +1,12 @@
 from pathlib import Path
 
-from app.core.celery import worker_celery_app
+from celery import shared_task
+
 from app.models.enum import ImageStatus
 from app.utils.image import process_raw_image, safe_remove
 
 
-@worker_celery_app.task(bind=True, max_retries=2)
+@shared_task(bind=True, max_retries=2)
 def delete_image_task(self, image_path: str):
 
     if not image_path:
@@ -21,7 +22,7 @@ def delete_image_task(self, image_path: str):
         raise e
 
 
-@worker_celery_app.task(bind=True, max_retries=2)
+@shared_task(bind=True, max_retries=2)
 def process_item_image_task(self, raw_path: Path, image_id: int):
     try:
         final_path = process_raw_image(raw_path, 1200)
@@ -48,7 +49,7 @@ def process_item_image_task(self, raw_path: Path, image_id: int):
 # todo:- add a task for profile picture saving
 
 
-@worker_celery_app.task(bind=True, max_retries=2)
+@shared_task(bind=True, max_retries=2)
 def process_profile_image_task(self, raw_path: Path, user_id: int):
     try:
         final_path = process_raw_image(raw_path, 800)

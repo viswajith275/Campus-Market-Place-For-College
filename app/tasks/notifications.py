@@ -52,5 +52,7 @@ def run(user_id, title, message, type, payload):
 
 def push_to_redis(user_id: str, data: dict):
     r = redis.from_url(settings.redis_url)
-    r.publish(f"sse:{user_id}", json.dumps(data))
-    r.close()
+    try:
+        r.publish(f"sse:{user_id}", json.dumps(data))
+    finally:
+        r.close()
