@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api import deps
 from app.core.config import settings
 from app.core.security import create_token
-from app.models.user import User
 from app.schemas.user import PrivateUsersResponse, UserCreate
 from app.services import user_service
 

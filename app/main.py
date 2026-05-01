@@ -27,7 +27,11 @@ app.add_exception_handler(BadRequest, exception_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://0.0.0.0:5173", "null"],  # change this uri
+    allow_origins=[
+        "http://0.0.0.0:5173",
+        "null",
+        "https://58069b5243d057b6-49-47-194-63.serveousercontent.com",
+    ],  # change this uri
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
